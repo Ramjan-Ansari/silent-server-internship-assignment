@@ -1,0 +1,77 @@
+==============================
+AUTHENTICATION FLOW TEST OUTPUT
+==============================
+
+1️⃣ LOGIN REQUEST
+------------------------------
+Command:
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"ramjanansari32426@gmail.com","password":"hello$123"}'
+
+Response:
+{
+  "message": "OTP sent",
+  "loginSessionId": "rck3hh"
+}
+
+(OTP observed in server logs: 256537)
+
+
+
+2️⃣ VERIFY OTP
+------------------------------
+Command:
+curl -c cookies.txt -X POST http://localhost:3000/auth/verify-otp \
+  -H "Content-Type: application/json" \
+  -d '{"loginSessionId":"rck3hh","otp":"256537"}'
+
+Response:
+{
+  "message": "OTP verified",
+  "sessionId": "rck3hh"
+}
+
+
+
+3️⃣ EXCHANGE SESSION FOR JWT TOKEN
+------------------------------
+Command:
+curl -b cookies.txt -X POST http://localhost:3000/auth/token
+
+Response:
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJhbWphbmFuc2FyaTMyNDI2QGdtYWlsLmNvbSIsInNlc3Npb25JZCI6InJjazNoaCIsImlhdCI6MTc3MDkwNTM5MywiZXhwIjoxNzcwOTA2MjkzfQ.Pg_3jej9P73lsM2yt2b4tIk2OPl0KKybOxd9dQgD35w",
+  "expires_in": 900
+}
+
+
+
+4️⃣ ACCESS PROTECTED ROUTE
+------------------------------
+Command:
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJhbWphbmFuc2FyaTMyNDI2QGdtYWlsLmNvbSIsInNlc3Npb25JZCI6InJjazNoaCIsImlhdCI6MTc3MDkwNTM5MywiZXhwIjoxNzcwOTA2MjkzfQ.Pg_3jej9P73lsM2yt2b4tIk2OPl0KKybOxd9dQgD35w" \
+http://localhost:3000/protected
+
+Response:
+{
+  "message": "Access granted",
+  "user": {
+    "email": "ramjanansari32426@gmail.com",
+    "sessionId": "rck3hh",
+    "iat": 1770905393,
+    "exp": 1770906293
+  },
+  "success_flag": "FLAG-cmFtamFuYW5zYXJpMzI0MjZAZ21haWwuY29tX0NPTVBMRVRFRF9BU1NJR05NRU5U"
+}
+
+
+----------------------------------------
+Note:
+All routes were additionally tested using Thunder Client 
+to ensure proper API behavior and cookie handling.
+----------------------------------------
+
+==============================
+ALL TESTS COMPLETED SUCCESSFULLY
+==============================
